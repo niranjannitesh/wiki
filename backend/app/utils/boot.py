@@ -13,7 +13,7 @@ def boot():
         full_path = os.path.join(path, name)
         relative_path = full_path.replace(DOCS_DIR, '.')
         file_contents = open(full_path, "r").read()
-        title_regex = r"\\title{\\(.*?)}"
+        title_regex = r"\\title{(.*?)}"
         match = re.search(title_regex, file_contents)
         title = None
         if match:
