@@ -1,22 +1,19 @@
-import '../styles/globals.css'
 import Head from 'next/head'
-import styled from 'styled-components'
+
+import '../styles/globals.css'
+import Layout from '../components/Layout'
 
 function WikikiApp({ Component, pageProps }) {
   return <>
     <Head>
       <title>Wikiki</title>
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      <link rel="icon" href="/favicon.png" type="image/png" />
     </Head>
-    <AppWrapper>
+    <Layout>
       <Component {...pageProps} />
-    </AppWrapper>
+    </Layout>
   </>
 }
 
 export default WikikiApp
-
-const AppWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-`
