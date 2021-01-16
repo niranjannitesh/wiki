@@ -145,4 +145,4 @@ cython_debug/
 
 # docs
 docs/**/**
-!docs/index.tex
+!docs/index.md

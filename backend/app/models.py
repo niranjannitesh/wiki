@@ -12,7 +12,7 @@ class File(Model):
       data = {
           'id': self.id,
           'relative_path': str(self.relative_path).strip(),
-          'title': str(self.title).strip()
+          'title': str(self.title).strip() if self.title else None
       }
 
       return data
