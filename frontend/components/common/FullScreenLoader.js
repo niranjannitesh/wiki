@@ -1,4 +1,4 @@
-import Logo from "../components/Logo"
+import Logo from "./Logo"
 import styled from "styled-components"
 
 export default function FullScreenLoader() {
