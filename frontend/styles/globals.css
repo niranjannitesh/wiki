@@ -276,6 +276,7 @@ summary {
 }
 
 body {
+  overscroll-behavior: none;
   scroll-behavior: smooth;
   font-feature-settings: "kern";
   font-size: 16px;
@@ -330,7 +331,7 @@ blockquote {
   left: 0;
   right: 0;
   z-index: 999;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.3);
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -341,4 +342,25 @@ blockquote {
 
 .dialog-content {
   display: contents;
+}
+
+p a,
+a.reset {
+  outline: none;
+  color: #000;
+  text-decoration: none;
+
+  background-image: linear-gradient(to right, #888, #888);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  text-shadow: 0.1em 0 #fff, -0.1em 0 #fff, 0.05em 0 #fff, -0.05em 0 #fff;
+}
+
+p a:hover,
+p a:focus,
+p a:active,
+a.reset:hover,
+a.reset:focus {
+  color: #888;
 }

@@ -4,11 +4,13 @@ import FullScreenLoader from "./FullScreenLoader"
 import { UIProvider } from "../context/UIContext"
 import { FileProvider, useFile } from "../context/FileContext"
 import ErrorPage from "./ErrorPage"
+import Command from "./Command"
 
 function Layout({ children }) {
   return (
     <UIProvider>
       <FileProvider>
+        <Command />
         <BodyWrapper>
           <App>{children}</App>
         </BodyWrapper>
@@ -22,8 +24,8 @@ export default Layout
 const App = ({ children }) => {
   const { files, error } = useFile()
 
+  if (!files) return <FullScreenLoader />
   if (error) return <ErrorPage />
-  if (!files && !error) return <FullScreenLoader />
   return children
 }
 

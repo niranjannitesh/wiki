@@ -1,61 +1,61 @@
 import tinykeys from "tinykeys"
-import React, { useEffect, useState } from "react"
-import styled from "styled-components"
-import Logo from "./Logo"
+import React, { useEffect, useState, useRef } from "react"
 import useDelayedRender from "use-delayed-render"
 import { DialogContent, DialogOverlay } from "@reach/dialog"
 import QuickMenu from "./QuickMenu"
+import { useUI } from "../context/UIContext"
 
 export default function Command() {
   const [open, setOpen] = useState(false)
+  const commandRef = useRef()
+  const {
+    openQuickOpenModal,
+    closeQuickOpenModal,
+    displayQuickOpenModal,
+  } = useUI()
 
-  const { mounted, rendered } = useDelayedRender(open, {
+  const { mounted, rendered } = useDelayedRender(displayQuickOpenModal, {
     enterDelay: -1,
     exitDelay: 200,
   })
 
   useEffect(() => {
     let unsubscribe = tinykeys(window, {
-      "$mod+k": () => setOpen((o) => !o),
+      "$mod+k": () =>
+        displayQuickOpenModal ? closeQuickOpenModal() : openQuickOpenModal(),
     })
     return () => {
       unsubscribe()
     }
   })
 
+  useEffect(() => {
+    if (commandRef.current) {
+      // Bounce the UI slightly
+      commandRef.current.style.transform = "scale(0.99)"
+      commandRef.current.style.transition = "transform 0.1s ease"
+      // Not exactly safe, but should be OK
+      setTimeout(() => {
+        if (commandRef.current) commandRef.current.style.transform = ""
+      }, 100)
+    }
+  })
+
   return (
     <>
-      <CommandButton title="⌘K" onClick={() => setOpen(true)}>
-        <Logo width="36px" height="36px" />
-      </CommandButton>
-
       <DialogOverlay
         className={`screen ${rendered ? "show" : ""}`}
         isOpen={mounted}
-        onDismiss={() => setOpen(false)}
+        onDismiss={() => closeQuickOpenModal()}
       >
         <DialogContent className="dialog-content" aria-label="Site Navigation">
-          <QuickMenu style={{ top: 190, position: "relative" }} />
+          <QuickMenu
+            style={{ top: "15vh", position: "relative" }}
+            ref={commandRef}
+            onClickCallback={() => closeQuickOpenModal()}
+          />
         </DialogContent>
       </DialogOverlay>
     </>
   )
 }
-
-const CommandButton = styled.button`
-  width: 50px;
-  height: 50px;
-
-  background-color: #f5f5f5;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-
-  :focus {
-    outline: none;
-  }
-`

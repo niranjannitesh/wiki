@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import styled from "styled-components"
 import { useRouter } from "next/router"
 import { useFile } from "../context/FileContext"
 
-export default function QuickMenu({ style }) {
+const QuickMenu = React.forwardRef(({ style, onClickCallback }, ref) => {
   const { files, error } = useFile()
   const router = useRouter()
 
@@ -14,7 +14,7 @@ export default function QuickMenu({ style }) {
   }, [])
 
   return (
-    <Wrapper style={style}>
+    <Wrapper style={style} ref={ref}>
       <SearchWrapper>
         <SearchInput
           ref={input}
@@ -28,7 +28,10 @@ export default function QuickMenu({ style }) {
             .sort((a, b) => ("" + a.title).localeCompare(b.title))
             .map((file, index) => (
               <Item
-                onClick={() => router.push("/file/" + file.id)}
+                onClick={() => {
+                  router.push("/file/" + file.id)
+                  onClickCallback && onClickCallback()
+                }}
                 key={file.id}
               >
                 {file.title || file.relative_path}
@@ -38,7 +41,9 @@ export default function QuickMenu({ style }) {
       )}
     </Wrapper>
   )
-}
+})
+
+export default QuickMenu
 
 const Wrapper = styled.div`
   max-width: 600px;
@@ -50,6 +55,9 @@ const Wrapper = styled.div`
 
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  z-index: 9999;
 `
 
 const SearchWrapper = styled.div`

@@ -1,12 +1,4 @@
-const md = require("markdown-it")({})
-const mk = require("markdown-it-katex")
-import ma from "../lib/anchor"
-
-md.use(mk).use(ma)
-
-export default function MarkdownView({ file }) {
-  const html = md.render(file.contents)
-
+export default function MarkdownView({ html }) {
   return (
     <div>
       <article dangerouslySetInnerHTML={{ __html: html }}></article>
