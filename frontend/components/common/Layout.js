@@ -24,8 +24,8 @@ export default Layout
 const App = ({ children }) => {
   const { files, error } = useFile()
 
-  if (!files) return <FullScreenLoader />
   if (error) return <ErrorPage />
+  if (!files) return <FullScreenLoader />
   return children
 }
 

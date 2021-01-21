@@ -1,3 +1,5 @@
+import { useFile } from "../components/context/FileContext"
+
 const md = require("markdown-it")({
   html: true,
   breaks: true,
@@ -6,6 +8,7 @@ const md = require("markdown-it")({
 // const mk = require("markdown-it-katex")
 const mk = require("@iktakahiro/markdown-it-katex")
 import ma from "./anchor"
+import mf from "./linkFile"
 
 md.use(mk, { throwOnError: false, errorColor: " #cc0000" }).use(ma)
 
@@ -46,4 +49,33 @@ md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
 
   // pass token to default renderer.
   return defaultRender(tokens, idx, options, env, self)
+}
+
+/**
+ * Hooks
+ */
+
+function getHeadings(html) {
+  const el = document.createElement(`div`)
+  el.innerHTML = html
+  const all_headings = el.querySelectorAll("h1, h2, h3, h4, h5, h6")
+  if (all_headings.length === 0) {
+    return
+  }
+  const response = []
+  all_headings.forEach((x) => {
+    response.push({
+      text: x.innerHTML,
+      id: x.id,
+    })
+  })
+  return response
+}
+
+export function useMarkdown(contents) {
+  const { files } = useFile()
+  let html = md.render(contents)
+  const all_headings = getHeadings(html)
+
+  return { html, all_headings }
 }

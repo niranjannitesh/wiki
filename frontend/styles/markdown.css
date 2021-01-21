@@ -25,7 +25,7 @@ article h6 {
 }
 
 article p {
-  color: var(--article-color);
+  color: #222;
 }
 
 article img {
@@ -34,7 +34,7 @@ article img {
   width: auto;
   margin: auto;
   display: block;
-  border-radius: var(--radius);
+  border-radius: 5px;
 }
 
 article [id]::before {
@@ -104,8 +104,8 @@ html[data-theme="light"] input[type="checkbox"]:checked {
 
 input[type="checkbox"]:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--gray);
-  border-color: var(--fg);
+  box-shadow: 0 0 0 2px #888;
+  border-color: #000;
 }
 
 /* Code Snippets */
@@ -116,7 +116,6 @@ input[type="checkbox"]:focus {
 
 article *:not(pre) > code {
   font-weight: 600;
-  font-family: var(--font-sans);
   font-size: 1rem;
   padding: 0 3px;
 }
@@ -124,14 +123,14 @@ article *:not(pre) > code {
 article *:not(pre) > code::before,
 article *:not(pre) > code::after {
   content: "\`";
-  color: var(--gray);
+  color: #888;
   user-select: none;
 }
 
 article pre {
   overflow-x: auto;
-  background: var(--lightest-gray);
-  border-radius: var(--inline-radius);
+  background: #fafafa;
+  border-radius: 5px;
   line-height: 1.8;
   padding: 1rem;
   font-size: 0.875rem;

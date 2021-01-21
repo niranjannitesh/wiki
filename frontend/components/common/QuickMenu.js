@@ -1,17 +1,78 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { useRouter } from "next/router"
 import { useFile } from "../context/FileContext"
+import Fuse from "fuse.js"
 
 const QuickMenu = React.forwardRef(({ style, onClickCallback }, ref) => {
   const { files, error } = useFile()
   const router = useRouter()
+  const fuse = new Fuse(files, { keys: ["title"], threshold: 0.2 })
 
   const input = useRef()
+  const resultsParent = useRef()
 
   useEffect(() => {
     input.current?.focus()
   }, [])
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [focusIndex, setFocusIndex] = useState(0)
+  const [searchResults, setSearchResults] = useState([])
+
+  useEffect(() => {
+    const result = fuse.search(searchTerm)
+    setSearchResults(result.map((x) => x.item))
+
+    if (!searchTerm) {
+      setSearchResults(files)
+    }
+    setFocusIndex(0)
+  }, [searchTerm])
+
+  const onSelect = (index) => {
+    if (index === searchResults.length) {
+      // search
+      const term = encodeURI(searchTerm)
+      router.push({
+        pathname: "/search",
+        query: { q: term },
+      })
+      onClickCallback && onClickCallback()
+    } else {
+      const file = searchResults[index]
+      router.push("/file/" + file.id)
+      onClickCallback && onClickCallback()
+    }
+  }
+
+  const handleKeyUp = (e) => {
+    if (e.keyCode === 38) {
+      // onUp()
+      if (focusIndex > 0) setFocusIndex(focusIndex - 1)
+      else if (searchTerm) setFocusIndex(searchResults.length)
+      else setFocusIndex(searchResults.length - 1)
+
+      resultsParent.current?.children[focusIndex].scrollIntoView({
+        block: "nearest",
+      })
+    } else if (e.keyCode === 40) {
+      // onDown()
+      if (searchTerm) {
+        if (focusIndex < searchResults.length) setFocusIndex(focusIndex + 1)
+        else setFocusIndex(0)
+      } else {
+        if (focusIndex < searchResults.length - 1) setFocusIndex(focusIndex + 1)
+        else setFocusIndex(0)
+      }
+
+      resultsParent.current?.children[focusIndex].scrollIntoView({
+        block: "nearest",
+      })
+    } else if (e.keyCode === 13) {
+      onSelect(focusIndex)
+    }
+  }
 
   return (
     <Wrapper style={style} ref={ref}>
@@ -20,28 +81,36 @@ const QuickMenu = React.forwardRef(({ style, onClickCallback }, ref) => {
           ref={input}
           type="text"
           placeholder="Jump to a file or search..."
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyUp={handleKeyUp}
         />
       </SearchWrapper>
       {files && (
-        <ItemsWrapper>
-          {files
-            .sort((a, b) => ("" + a.title).localeCompare(b.title))
-            .map((file, index) => (
-              <Item
-                onClick={() => {
-                  router.push("/file/" + file.id)
-                  onClickCallback && onClickCallback()
-                }}
-                key={file.id}
-              >
-                {file.title || file.relative_path}
-              </Item>
-            ))}
+        <ItemsWrapper ref={resultsParent}>
+          {searchResults.map((file, index) => (
+            <Item
+              className={index === focusIndex ? "focused" : ""}
+              onClick={() => onSelect(index)}
+              key={file.id}
+            >
+              {file.title || file.relative_path}
+            </Item>
+          ))}
+          {searchTerm && (
+            <Item
+              className={searchResults.length === focusIndex ? "focused" : ""}
+              onClick={() => onSelect(searchResults.length)}
+            >
+              search for <SearchTerm>{searchTerm}</SearchTerm>
+            </Item>
+          )}
         </ItemsWrapper>
       )}
     </Wrapper>
   )
 })
+
+QuickMenu.displayName = "QuickMenu"
 
 export default QuickMenu
 
@@ -83,8 +152,6 @@ const SearchInput = styled.input`
 
 const ItemsWrapper = styled.div`
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
   max-height: calc(400px - 61px);
 `
 
@@ -98,19 +165,23 @@ const Item = styled.button`
   color: #7d7d7d;
   transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
 
-  :hover {
+  :hover,
+  &.focused {
     background: #f5f5f5;
     color: #222222;
   }
 
   :focus {
     outline: none;
-    background: #f5f5f5;
-    color: #222222;
   }
 
   :active {
     background: #e2e2e2;
     color: #222222;
   }
+`
+
+const SearchTerm = styled.span`
+  font-weight: 500;
+  color: #000;
 `

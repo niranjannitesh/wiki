@@ -4,36 +4,18 @@ import fetcher from "../../lib/fetch"
 import ErrorPage from "../../components/common/ErrorPage"
 import styled from "styled-components"
 import MarkdownView from "../../components/MarkdownView"
-import md from "../../lib/md"
+import { useMarkdown } from "../../lib/md"
 import Logo from "../../components/common/Logo"
 import { useUI } from "../../components/context/UIContext"
-
-function getHeadings(html) {
-  const el = document.createElement(`div`)
-  el.innerHTML = html
-  const all_headings = el.querySelectorAll("h1, h2, h3, h4, h5, h6")
-  if (all_headings.length === 0) {
-    return
-  }
-  const response = []
-  all_headings.forEach((x) => {
-    response.push({
-      text: x.innerHTML,
-      id: x.id,
-    })
-  })
-  return response
-}
 
 export default function FilePage({ id }) {
   const { data: file, error } = useSWR("/api/file/" + id, fetcher)
   const { openQuickOpenModal } = useUI()
 
-  if (!file) return <FullScreenLoader />
   if (error) return <ErrorPage />
+  if (!file) return <FullScreenLoader />
 
-  let html = md.render(file.contents)
-  const all_headings = getHeadings(html)
+  const { html, all_headings } = useMarkdown(file.contents)
 
   return (
     <PageWrapper>
