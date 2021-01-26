@@ -72,9 +72,32 @@ function getHeadings(html) {
   return response
 }
 
+function autoLinkFiles(html, files) {
+  const file_link_regex = /\[\[(.*)\]\]/g
+  const matches = html.match(file_link_regex)
+  if (matches) {
+    for (let match of matches) {
+      const text = match.replace("[[", "").replace("]]", "").trim()
+      let [file_name, custom_label] = text.split("|")
+      file_name = file_name.trim()
+      const file = files.find((x) => x.title === file_name)
+      if (file) {
+        html = html.replace(
+          match,
+          `<a class="auto-file-link" data-file-id="${file.id}" href="/file/${
+            file.id
+          }">${custom_label || file_name}</a>`
+        )
+      }
+    }
+  }
+  return html
+}
+
 export function useMarkdown(contents) {
   const { files } = useFile()
-  let html = md.render(contents)
+  let html = autoLinkFiles(md.render(contents), files)
+
   const all_headings = getHeadings(html)
 
   return { html, all_headings }
